@@ -1,17 +1,36 @@
-package app 
+package app
 
-import "net/http"
+import (
+	"fmt"
+	"github.com/tekluabayney/taskmanger/routers"
+	"log"
+	"net/http"
+)
 
-type APP struct { 
+type App struct {
 	router http.Handler
-} 
-func New() *APP{ 
- return &APP{ 
-   reouter chi.NewRouter()
-	} 
-} 
+}
 
+func New() *App {
+	app := &App{
+		router: routers.LoadRouter(),
+	}
 
+	return app
+}
 
+func (app *App) Start() {
 
+	server := &http.Server{
+		Addr:    ":3000",
+		Handler: app.router,
+	}
 
+	fmt.Println("Server is running at http://localhost:3000")
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatalf("Failed to serve server %v", err)
+
+	}
+
+}
