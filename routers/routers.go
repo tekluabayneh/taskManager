@@ -4,10 +4,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-
-	"net/http"
-
 	"github.com/tekluabayney/taskmanger/handlers"
+	"net/http"
 )
 
 func LoadRouter() *chi.Mux {
@@ -37,12 +35,12 @@ func LoadRouter() *chi.Mux {
 }
 
 func getTasks(router chi.Router) {
-	getTaskRoute := &handlers.Task{}
+	getTaskRoute := &handlers.Taskhandler{}
 	router.Get("/", getTaskRoute.GetTask)
 }
 
 func UpdateTask(router chi.Router) {
-	updateTasksHandler := &handlers.Task{}
-	router.Put("/", updateTasksHandler.updatTask)
+	updateTasksHandler := &handlers.Taskhandler{}
+	router.Put("/", updateTasksHandler.UpdateTask)
 
 }

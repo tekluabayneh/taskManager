@@ -5,6 +5,7 @@ import (
 	"github.com/tekluabayney/taskmanger/routers"
 	"log"
 	"net/http"
+	"os"
 )
 
 type App struct {
@@ -20,9 +21,9 @@ func New() *App {
 }
 
 func (app *App) Start() {
-
+	PORT := os.Getenv("PORT")
 	server := &http.Server{
-		Addr:    ":3000",
+		Addr:    ":" + PORT,
 		Handler: app.router,
 	}
 

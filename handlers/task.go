@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-type Task struct{}
+type Taskhandler struct{}
 
-func (T *Task) GetTask(w http.ResponseWriter, r *http.Request) {
+func (T *Taskhandler) GetTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("get task")
 }
 
-func (T *Task) UpdatTask(w http.ResponseWriter, r *http.Request) {
+func (T *Taskhandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("udpate task")
 }
