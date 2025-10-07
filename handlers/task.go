@@ -8,6 +8,7 @@ import (
 type Taskhandler struct{}
 
 func (T *Taskhandler) GetTask(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r)
 	fmt.Println("get task")
 }
 
