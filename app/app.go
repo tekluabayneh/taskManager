@@ -19,18 +19,6 @@ type App struct {
 }
 
 func New() *App {
-	app := &App{
-		router: routers.LoadRouter(),
-	}
-	return app
-}
-
-func (app *App) Start() {
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
-		PORT = "9090"
-	}
-
 	DBURL := os.Getenv("DB_URL")
 	if DBURL == "" {
 		log.Fatal("DB_URL is empty")
@@ -41,9 +29,24 @@ func (app *App) Start() {
 		log.Fatalf("Unable to connect to DB: %v\n", err)
 	}
 
-	app.pool = pool
+	// Create SQLC queries instance
+	db := db.New(pool)
+
+	app := &App{
+		db:     db,
+		pool:   pool,
+		router: routers.LoadRouter(db),
+	}
+	return app
+}
+
+func (app *App) Start() {
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "9090"
+	}
+
 	defer app.pool.Close()
-	// app.db = db.New(pool)
 
 	server := &http.Server{
 		Addr:    ":" + PORT,
@@ -52,6 +55,6 @@ func (app *App) Start() {
 
 	fmt.Printf("Server running at http://localhost:%s\n", PORT)
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf(" Server failed: %v", err)
+		log.Fatalf("Server failed: %v", err)
 	}
 }
