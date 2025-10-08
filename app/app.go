@@ -29,7 +29,6 @@ func New() *App {
 		log.Fatalf("Unable to connect to DB: %v\n", err)
 	}
 
-	// Create SQLC queries instance
 	db := db.New(pool)
 
 	app := &App{
