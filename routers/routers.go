@@ -32,30 +32,37 @@ func LoadRouter(db *db.Queries) *chi.Mux {
 
 	})
 
-	router.Route("/getTask", func(r chi.Router) {
-		getTasks(r, db)
+	router.Route("/tasks", func(r chi.Router) {
+		TaskRouter(r, db)
 	},
 	)
-	router.Route("/updateTask", func(r chi.Router) {
-		getTasks(r, db)
+	router.Route("/users", func(r chi.Router) {
+		UserRouter(r, db)
 	},
 	)
 
 	return router
 }
 
-func getTasks(router chi.Router, q *db.Queries) {
-	getTaskRoute := &handlers.Taskhandler{
+func TaskRouter(router chi.Router, q *db.Queries) {
+	TaskHandeler := &handlers.Taskhandler{
 		DB: q,
 	}
+	router.Get("/getTask", TaskHandeler.GetTask)
+	router.Get("/updateTask", TaskHandeler.UpdateTask)
+	router.Get("/deleteTask", TaskHandeler.DeleteTask)
+	router.Get("/getSingleTask", TaskHandeler.GetSingleTask)
 
-	router.Get("/", getTaskRoute.GetTask)
 }
 
-func UpdateTask(router chi.Router, q *db.Queries) {
-	updateTasksHandler := &handlers.Taskhandler{
+func UserRouter(router chi.Router, q *db.Queries) {
+	UserHnadler := &handlers.UserType{
 		DB: q,
 	}
-	router.Get("/", updateTasksHandler.UpdateTask)
+
+	router.Get("/getUser", UserHnadler.GetUser)
+	router.Get("/updateUser", UserHnadler.UpdateUser)
+	router.Get("/deleteUser", UserHnadler.DeleteUser)
+	router.Get("/getSingleUser", UserHnadler.InsertUser)
 
 }
