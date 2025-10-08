@@ -4,6 +4,18 @@
 
 package database
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+type Task struct {
+	ID          int32
+	Title       string
+	Description pgtype.Text
+	Status      pgtype.Text
+	UserID      pgtype.Int4
+}
+
 type User struct {
 	ID    int32
 	Name  string
