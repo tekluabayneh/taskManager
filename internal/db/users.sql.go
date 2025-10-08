@@ -28,11 +28,22 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
+SELECT id, name, email FROM users
+`
+
+func (q *Queries) GetUser(ctx context.Context) (User, error) {
+	row := q.db.QueryRow(ctx, getUser)
+	var i User
+	err := row.Scan(&i.ID, &i.Name, &i.Email)
+	return i, err
+}
+
+const getsingleUser = `-- name: GetsingleUser :one
 SELECT id, name, email FROM users WHERE id = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
+func (q *Queries) GetsingleUser(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRow(ctx, getsingleUser, id)
 	var i User
 	err := row.Scan(&i.ID, &i.Name, &i.Email)
 	return i, err
