@@ -49,8 +49,9 @@ func TaskRouter(router chi.Router, q *db.Queries) {
 		DB: q,
 	}
 	router.Get("/getTask", TaskHandeler.GetTask)
-	router.Get("/updateTask", TaskHandeler.UpdateTask)
-	router.Get("/deleteTask", TaskHandeler.DeleteTask)
+	router.Put("/updateTask", TaskHandeler.UpdateTask)
+	router.Post("/newTask", TaskHandeler.NewTask)
+	router.Delete("/deleteTask", TaskHandeler.DeleteTask)
 	router.Get("/getSingleTask", TaskHandeler.GetSingleTask)
 
 }
@@ -60,9 +61,10 @@ func UserRouter(router chi.Router, q *db.Queries) {
 		DB: q,
 	}
 
-	router.Get("/getUser", UserHnadler.GetUser)
-	router.Get("/updateUser", UserHnadler.UpdateUser)
-	router.Get("/deleteUser", UserHnadler.DeleteUser)
-	router.Get("/getSingleUser", UserHnadler.InsertUser)
+	router.Get("/getUser", UserHnadler.GetUsers)
+	router.Put("/updateUser", UserHnadler.UpdateUser)
+	router.Delete("/deleteUser", UserHnadler.DeleteUser)
+	router.Get("/getSingleUser", UserHnadler.GetSingUser)
+	router.Post("/newUser", UserHnadler.InsertUser)
 
 }
