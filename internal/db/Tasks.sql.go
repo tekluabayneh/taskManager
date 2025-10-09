@@ -11,6 +11,37 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createTask = `-- name: CreateTask :one
+INSERT INTO tasks(title, description, status, user_id)
+VALUES ($1, $2, $3, $4)
+RETURNING id, title, description, status, user_id
+`
+
+type CreateTaskParams struct {
+	Title       string
+	Description pgtype.Text
+	Status      pgtype.Text
+	UserID      pgtype.Int4
+}
+
+func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, error) {
+	row := q.db.QueryRow(ctx, createTask,
+		arg.Title,
+		arg.Description,
+		arg.Status,
+		arg.UserID,
+	)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Status,
+		&i.UserID,
+	)
+	return i, err
+}
+
 const getTasks = `-- name: GetTasks :many
 SELECT id, title, description, status, user_id FROM tasks
 `
@@ -39,35 +70,4 @@ func (q *Queries) GetTasks(ctx context.Context) ([]Task, error) {
 		return nil, err
 	}
 	return items, nil
-}
-
-const createTask = `-- name: createTask :one
-INSERT INTO tasks(title, description, status, user_id)
-VALUES ($1, $2, $3, $4)
-RETURNING id, title, description, status, user_id
-`
-
-type createTaskParams struct {
-	Title       string
-	Description pgtype.Text
-	Status      pgtype.Text
-	UserID      pgtype.Int4
-}
-
-func (q *Queries) createTask(ctx context.Context, arg createTaskParams) (Task, error) {
-	row := q.db.QueryRow(ctx, createTask,
-		arg.Title,
-		arg.Description,
-		arg.Status,
-		arg.UserID,
-	)
-	var i Task
-	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Description,
-		&i.Status,
-		&i.UserID,
-	)
-	return i, err
 }
