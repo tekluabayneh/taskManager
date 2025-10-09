@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"context"
+	_ "context"
+	_ "encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	db "github.com/tekluabayney/taskmanger/internal/db"
@@ -12,14 +12,48 @@ import (
 type Taskhandler struct {
 	DB *db.Queries
 }
+type taskFormater struct {
+	Id          int32  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	UserId      string `json:"userid"`
+}
 
 func (h *Taskhandler) GetTask(w http.ResponseWriter, r *http.Request) {
-	user, err := h.DB.GetUser(context.Background(), 5)
+	task, err := h.DB.GetTasks(context.Background())
 	if err != nil {
-		fmt.Println("failed toget user")
+		http.Error(w, "failed toget user", http.StatusInternalServerError)
+		return
 	}
-	fmt.Println("get task")
-	fmt.Println(user)
+
+	result := formatType{
+		Id:    task
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(task)
+
+}
+func (h *Taskhandler) NewTask(w http.ResponseWriter, r *http.Request) {
+	var inputFormater taskFormater
+
+	err := json.NewDecoder(r.Body).Decode(&inputFormater)
+	if err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	task, err := h.DB.CreateTask(context.Background(), inputFormater)
+
+	if err != nil {
+		http.Error(w, "task didn't created", http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(task)
+
 }
 
 func (h *Taskhandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
@@ -33,19 +67,17 @@ func (h *Taskhandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		Email: "man@gmail.com",
 	}
 
-	user, err := h.DB.CreateUser(context.Background(), nUser)
+	user, err := h.DB.(context.Background(), nUser)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(user)
-
 }
 
 func (h *Taskhandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("task delted")
 }
 
 func (h *Taskhandler) GetSingleTask(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("get single task")
 }
