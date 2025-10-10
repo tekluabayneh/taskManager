@@ -42,6 +42,41 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 	return i, err
 }
 
+const deleteTask = `-- name: DeleteTask :one
+DELETE  FROM tasks WHERE id = $1 
+RETURNING id, title, description, status, user_id
+`
+
+func (q *Queries) DeleteTask(ctx context.Context, id int32) (Task, error) {
+	row := q.db.QueryRow(ctx, deleteTask, id)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Status,
+		&i.UserID,
+	)
+	return i, err
+}
+
+const getSingTask = `-- name: GetSingTask :one
+SELECT id, title, description, status, user_id from tasks WHERE id = $1
+`
+
+func (q *Queries) GetSingTask(ctx context.Context, id int32) (Task, error) {
+	row := q.db.QueryRow(ctx, getSingTask, id)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Status,
+		&i.UserID,
+	)
+	return i, err
+}
+
 const getTasks = `-- name: GetTasks :many
 SELECT id, title, description, status, user_id FROM tasks
 `
@@ -70,4 +105,34 @@ func (q *Queries) GetTasks(ctx context.Context) ([]Task, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTask = `-- name: UpdateTask :one
+UPDATE tasks SET title = $1, description = $2, status = $3 WHERE id = $4
+RETURNING id, title, description, status, user_id
+`
+
+type UpdateTaskParams struct {
+	Title       string
+	Description pgtype.Text
+	Status      pgtype.Text
+	ID          int32
+}
+
+func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
+	row := q.db.QueryRow(ctx, updateTask,
+		arg.Title,
+		arg.Description,
+		arg.Status,
+		arg.ID,
+	)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Status,
+		&i.UserID,
+	)
+	return i, err
 }
