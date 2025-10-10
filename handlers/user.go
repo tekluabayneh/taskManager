@@ -57,6 +57,38 @@ func (h *UserType) GetSingUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserType) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
+	var newtype formatType
+	err := json.NewDecoder(r.Body).Decode(&newtype)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "invalid json",
+		})
+		http.Error(w, "User not updated", http.StatusBadRequest)
+		return
+	}
+
+	data := db.UpdateUserParams{
+		ID:    newtype.Id,
+		Name:  newtype.Name,
+		Email: newtype.Email,
+	}
+
+	NewUser, err := h.DB.UpdateUser(context.Background(), data)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "invalid json",
+		})
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"msg": NewUser,
+	})
+
 }
 
 func (h *UserType) InsertUser(w http.ResponseWriter, r *http.Request) {
@@ -85,12 +117,28 @@ func (h *UserType) InsertUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]any{
 			"erro": "internal server error ", "msg": err})
 		return
+
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(data)
 
 }
-func (h *UserType) DeleteUser(q http.ResponseWriter, r *http.Request) {
+
+func (h *UserType) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	var inputtpe formatType
+	json.NewDecoder(r.Body).Decode(&inputtpe)
+	user, err := h.DB.DeleteUser(context.Background(), inputtpe.Id)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]any{
+			"erro": "internal server error ", "msg": err})
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]any{
+		"msg": "user is deleted ", "deleted_user": user})
 
 }
